@@ -24,16 +24,16 @@ subroutine gibbsbys(p, Yt_mat, Z_mat, N, SeSp, Ycols, Zrows, Zcols, U, iter, bur
     integer, intent(out) :: res(N)             ! Sum of positive statuses after burn-in
 
     !-- Local Vars --!
-    integer :: g, i, j, k, s        ! Loop counters
+    integer :: g, i, j, k, s        ! Counters and indices
     integer :: p_id                 ! Current pool ID
     integer :: p_sz                 ! Current pool size
     integer :: p_res                ! Current pool's observed test result
     integer :: num_pos              ! Number of other positive individuals in the current pool
     integer :: n_pools              ! Number of pools the current individual 'i' belongs to
-    real*8 :: prob0                 ! Proportional to P(status_i=0 | data, other statuses)
-    real*8 :: prob1                 ! Proportional to P(status_i=1 | data, other statuses)
+    real*8 :: prob0                 ! Conditional probability the individual is negative
+    real*8 :: prob1                 ! Conditional probability the individual is positive
     real*8 :: Se, Sp                ! Sensitivity and Specificity for the current pool
-    real*8 :: RSe, RSp              ! Effective Se/Sp based on pool test outcome
+    real*8 :: RSe, RSp              ! Se/Sp based probabilities for the observed test result
     
     ! Initialize result counter
     res = 0
@@ -97,6 +97,7 @@ subroutine gibbsbys(p, Yt_mat, Z_mat, N, SeSp, Ycols, Zrows, Zcols, U, iter, bur
             
             ! Normalize
             prob0 = prob0/(prob0 + prob1)
+            prob1 = prob1/(prob0 + prob1)
             
             ! Sample new status for current individual
             if(U(i, g) > prob0) then
