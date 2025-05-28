@@ -31,7 +31,7 @@ subroutine gibbsbys(p, Yt_mat, Z_mat, N, SeSp, Ycols, Zrows, Zcols, U, iter, bur
     integer :: num_pos              ! Number of other positive individuals in the current pool
     integer :: n_pools              ! Number of pools the current individual 'i' belongs to
     real*8 :: prob0                 ! Conditional probability the individual is negative
-    real*8 :: prob1                 ! Conditional probability the individual is positive
+    real*8 :: prob1                 ! Unnormalized conditional probability the individual is positive
     real*8 :: Se, Sp                ! Sensitivity and Specificity for the current pool
     real*8 :: RSe, RSp              ! Se/Sp based probabilities for the observed test result
     
@@ -97,7 +97,6 @@ subroutine gibbsbys(p, Yt_mat, Z_mat, N, SeSp, Ycols, Zrows, Zcols, U, iter, bur
             
             ! Normalize
             prob0 = prob0/(prob0 + prob1)
-            prob1 = prob1/(prob0 + prob1)
             
             ! Sample new status for current individual
             if(U(i, g) > prob0) then
