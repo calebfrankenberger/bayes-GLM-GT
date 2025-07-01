@@ -1,5 +1,8 @@
 #MH_WLS.R
 
+## DISCLAIMER: THIS CODE WAS NOT WRITTEN BY ME, AND IS CURRENTLY HERE FOR TESTING PURPOSES.
+## IT WILL EVENTUALLY BE REPLACED WITH MORE GENERAL CODE.
+
 ########################################################
 # Bayesian Regression Models (McMahan et al., 2017)   
 # Assay Accuracy Parameters (Se & Sp): KNOWN          
