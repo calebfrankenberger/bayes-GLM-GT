@@ -19,29 +19,29 @@ SPECIALFLAGS=
 
 RCFLAGS=-O coff --use-temp-file $(IDIR)
 
-PRJ_FFLAGS=-fno-underscoring -fopenmp
+PRJ_FFLAGS=-fno-underscoring
 
 PRJ_CFLAGS=
 
-PRJ_LFLAGS=-mrtd -static -fopenmp
+PRJ_LFLAGS=-mrtd -static
 
-FFLAGS=$(SPECIALFLAGS) $(OPTFLAGS) $(IDIR) $(PRJ_FFLAGS) -JC:/Users/caleb/Desktop/Research/bayes-GLM-GT/Fortran/modules 
+FFLAGS=$(SPECIALFLAGS) $(OPTFLAGS) $(IDIR) $(PRJ_FFLAGS) -JC:/Users/caleb/Desktop/Research/Fortran/modules 
 
 CFLAGS=$(SPECIALFLAGS) $(OPTFLAGS) $(IDIR) $(PRJ_CFLAGS)
 
-"build\latent_sampler.o": ".\latent_sampler.f90"
-	@echo Compiling .\latent_sampler.f90
-	@$(FC) -c -o "build\latent_sampler.o" $(FFLAGS) ".\latent_sampler.f90"
+"build\sampler.o": ".\sampler.f90"
+	@echo Compiling .\sampler.f90
+	@$(FC) -c -o "build\sampler.o" $(FFLAGS) ".\sampler.f90"
 
 clean: .SYMBOLIC
-	@echo Deleting build\latent_sampler.o and related files
-	@$(RM) "build\latent_sampler.o"
-	@echo Deleting latent_sampler.dll
-	@$(RM) "latent_sampler.dll"
+	@echo Deleting build\sampler.o and related files
+	@$(RM) "build\sampler.o"
+	@echo Deleting sampler.dll
+	@$(RM) "sampler.dll"
 
-"latent_sampler.dll":  "build\latent_sampler.o"
-	@echo Generating latent_sampler.dll
-	@$(FC) -o "latent_sampler.dll" -shared -Wl,--out-implib="latent_sampler.dll.a" -Wl,--output-def,"latent_sampler.def" $(SPECIALFLAGS) -static "build\latent_sampler.o" $(LDIR) $(PRJ_LFLAGS)
+"sampler.dll":  "build\sampler.o"
+	@echo Generating sampler.dll
+	@$(FC) -o "sampler.dll" -shared -Wl,--out-implib="sampler.dll.a" -Wl,--output-def,"sampler.def" $(SPECIALFLAGS) -static "build\sampler.o" $(LDIR) $(PRJ_LFLAGS)
 
-all: "latent_sampler.dll" .SYMBOLIC
+all: "sampler.dll" .SYMBOLIC
 

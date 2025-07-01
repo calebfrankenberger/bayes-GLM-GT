@@ -1,18 +1,18 @@
 {
   "Root":{
     "Folders":[],
-    "Name":"+bayes-GLM-GT (latent_sampler.dll)",
+    "Name":"+bayes-GLM-GT (sampler.dll)",
     "Files":[{
-        "filename":".\\latent_sampler.f90",
+        "filename":".\\sampler.f90",
         "enabled":"1"
       }]
   },
-  "Name":"bayes-GLM-GT (latent_sampler.dll)",
+  "Name":"bayes-GLM-GT (sampler.dll)",
   "Options":{
     "Compiler Options":{
-      "Fortran Flags":"-fno-underscoring -fopenmp",
+      "Fortran Flags":"-fno-underscoring",
       "Resource Flags":"",
-      "Link Flags":"-mrtd -static -fopenmp",
+      "Link Flags":"-mrtd -static",
       "C Flags":""
     },
     "Architecture":1,
@@ -25,7 +25,7 @@
       "Module Directory":"modules",
       "Include Directories":["Default Add-On Include Directory"]
     },
-    "Target":"latent_sampler.dll",
+    "Target":"sampler.dll",
     "Fortran Options":{
       "Floating Point Exception Trap":0,
       "Initialize Variables to Zero":"false",

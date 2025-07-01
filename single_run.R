@@ -22,8 +22,8 @@ src("mh_wls.R")
 src("results.R")
 
 # Load DLL if needed
-dll_path <- file.path("Fortran", paste0("latent_sampler", .Platform$dynlib.ext))
-if (!is.loaded("sample_latent_statuses"))
+dll_path <- file.path("Fortran", paste0("sampler", .Platform$dynlib.ext))
+if (!is.loaded("sample"))
   dyn.load(dll_path)
 
 # Settings

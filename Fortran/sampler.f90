@@ -1,12 +1,16 @@
 !-----------------------------------------------------------------------
-! Subroutine: sample_latent_statuses
+! Subroutine: sample
 ! Author: Caleb Frankenberger
 !-----------------------------------------------------------------------
 
-subroutine sample_latent_statuses(p, Yt_mat, Z_mat, N, SeSp, Ycols, Zrows, Zcols, U, Ztil) 
+subroutine sample(p, Yt_mat, Z_mat, N, SeSp, Ycols, Zrows, Zcols, U, Ztil, assay_vec, L, se_counts, sp_counts) 
     implicit none
     
     !-- Arguments --!
+    integer, intent(in) :: assay_vec(Zrows) ! Assay assignment for each pool
+    integer, intent(in) :: L                ! Number of unique assays
+    integer, intent(out) :: se_counts(2, L) ! [TP, FN] counts per assay
+    integer, intent(out) :: sp_counts(2, L) ! [TN, FP] counts per assay
     integer, intent(in) :: N        ! Number of individuals
     integer, intent(in) :: Ycols    ! Number of columns in Yt_mat
     integer, intent(in) :: Zrows    ! Number of rows in Z_mat (number of pools)
@@ -30,6 +34,11 @@ subroutine sample_latent_statuses(p, Yt_mat, Z_mat, N, SeSp, Ycols, Zrows, Zcols
     real*8 :: prob1                 ! Unnormalized conditional probability the individual is positive
     real*8 :: Se, Sp                ! Sensitivity and Specificity for the current pool
     real*8 :: RSe, RSp              ! Se/Sp based probabilities for the observed test result
+    integer :: p_true           ! True latent pool status (from Ztil)
+    integer :: a_id             ! Assay ID for current pool
+    
+    se_counts = 0
+    sp_counts = 0
     
     ! Loop each individual to sample their latent status
     do i=1, N
@@ -131,6 +140,23 @@ subroutine sample_latent_statuses(p, Yt_mat, Z_mat, N, SeSp, Ycols, Zrows, Zcols
             s = Z_mat(i, 2 + j)            ! Individual ID
             Ztil(i, 2 + j) = Yt_mat(s, 1)  ! Store their current sampled status
         end do
+    end do
+    
+    !--- Loop through pools to count TP/FN/TN/FP by assay ---!
+    do i = 1, Zrows
+        p_res = Z_mat(i, 1)     ! Observed test result
+        p_true = Ztil(i, 1)     ! True pool status
+        a_id   = assay_vec(i)   ! Assay index
+
+        if (p_true == 1 .and. p_res == 1) then
+            se_counts(1, a_id) = se_counts(1, a_id) + 1   ! TP
+        else if (p_true == 1 .and. p_res == 0) then
+            se_counts(2, a_id) = se_counts(2, a_id) + 1   ! FN
+        else if (p_true == 0 .and. p_res == 0) then
+            sp_counts(1, a_id) = sp_counts(1, a_id) + 1   ! TN
+        else if (p_true == 0 .and. p_res == 1) then
+            sp_counts(2, a_id) = sp_counts(2, a_id) + 1   ! FP
+        end if
     end do
     
 end subroutine

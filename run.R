@@ -41,7 +41,7 @@ settings <- list(
   known_acc  = FALSE,
   se_0       = 0.9,
   sp_0       = 0.9,
-  nsim       = 500,
+  nsim       = 10,
   post_git   = 6000,
   burn       = 1000,
   alpha      = 0.05,

@@ -99,7 +99,7 @@ run_replicates <- function(test_data, settings) {
   cl <- parallel::makeCluster(cores)
   
   parallel::clusterEvalQ(cl, {
-    dyn.load("Fortran/latent_sampler.dll")
+    dyn.load("Fortran/sampler.dll")
   })
   
   parallel::clusterExport(cl, varlist = c(
