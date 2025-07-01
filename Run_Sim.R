@@ -4,6 +4,18 @@
 ################################
 
 
+#TODO LIST:
+# Se0 and Sp0 separately
+# Script for individual run (with debugging)
+# Traceplot + Histogram capability - plot convergence
+# rbeta in Fortran (test in R first)
+# Test SeSp starting values + beta starting values
+# (0.99, 0.95, 0.75, 0.50, 0.25)
+# 5 beta values as well (0 as one)
+# ESE for SeSp
+# Any number of assays (L is the notation they used in the paper)
+# As much of the sampler in Fortran as we can feasibly do
+
 rm(list=ls())
 setwd("C:/Users/caleb/Desktop/Research/bayes-GLM-GT")
 
