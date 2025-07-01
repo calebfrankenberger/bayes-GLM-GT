@@ -75,6 +75,7 @@ infer_posterior <- function(test_data, settings) {
     se_sp     = se_sp
   )
   
+  all_samp   <- res$param
   post_samp  <- res$param[-(1:settings$burn), , drop = FALSE]
   post_means <- colMeans(post_samp)
   post_sds   <- apply(post_samp, 2, sd)
@@ -96,7 +97,8 @@ infer_posterior <- function(test_data, settings) {
       beta_mean = post_means,
       beta_sd   = post_sds,
       tests     = tsts,
-      cred_int  = cred_int
+      cred_int  = cred_int,
+      beta_all  = all_samp
     ),
     extra_out
   ))
@@ -106,7 +108,7 @@ infer_posterior <- function(test_data, settings) {
 #######################
 ## RUN REPLICATES    ##
 #######################
-run_replicates <- function(test_data, settings) {
+run_replicates <- function(test_data, settings, keep_raw=FALSE) {
   start_time <- Sys.time()
   
   cores <- parallel::detectCores(logical=TRUE)
@@ -142,6 +144,14 @@ run_replicates <- function(test_data, settings) {
   if (!settings$known_acc) {
     out$se_samps <- lapply(sim_list, `[[`, "se")
     out$sp_samps <- lapply(sim_list, `[[`, "sp")
+  }
+  
+  if (keep_raw) {
+    out$beta_raw <- lapply(sim_list, `[[`, "beta_all")
+    if (!settings$known_acc) {
+      out$se_raw   <- lapply(sim_list, `[[`, "se")
+      out$sp_raw   <- lapply(sim_list, `[[`, "sp")
+    }
   }
   
   end_time <- Sys.time()

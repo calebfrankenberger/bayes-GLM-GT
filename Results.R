@@ -321,4 +321,57 @@ save_results <- function(summary, settings, filename = NULL) {
 }
 
 
+########################
+##  DIAGNOSTIC PLOTS  ##
+########################
+plot_trace <- function(results, settings, replicate = 1, parameter = 1, type = c("beta","se","sp")) {
+  type <- match.arg(type)
+  raw  <- switch(type,
+                 beta = results$beta_raw,
+                 se   = results$se_raw,
+                 sp   = results$sp_raw)
+  chain <- raw[[replicate]][, parameter]
+  burn  <- settings$burn
+  
+  param_label <- switch(type,
+                        beta = paste0("beta_", parameter - 1),
+                        se   = paste0("Se_",    parameter),
+                        sp   = paste0("Sp_",    parameter))
+  
+  oldpar <- par(mar = c(4,4,2,1))
+  plot(chain,
+       type = "l",
+       col  = "steelblue",
+       lwd  = 1.5,
+       xlab = "Iteration",
+       ylab = "Value",
+       main = sprintf("Traceplot: %s (Replication %d)",
+                      param_label, replicate))
+  abline(v = burn, col = "red", lty = 2, lwd = 1.5)
+  par(oldpar)
+}
+
+plot_post_hist <- function(results, settings, replicate = 1, parameter = 1, type = c("beta","se","sp"), breaks = 30) {
+  type <- match.arg(type)
+  raw  <- switch(type,
+                 beta = results$beta_raw,
+                 se   = results$se_raw,
+                 sp   = results$sp_raw)
+  chain <- raw[[replicate]][-(1:settings$burn), parameter]
+  
+  oldpar <- par(mar = c(4,4,2,1))
+  hist(chain, breaks = breaks, freq = FALSE,
+       col    = "steelblue", border = "black",
+       xlab   = "Value",
+       ylab   = "Density",
+       main   = sprintf("Histogram: %s (Replication %d)",
+                        switch(type,
+                               beta = paste0("beta_", parameter-1),
+                               se   = paste0("Se_",   parameter),
+                               sp   = paste0("Sp_",   parameter)),
+                        replicate))
+  par(oldpar)
+}
+
+
 ## END OF FILE ##

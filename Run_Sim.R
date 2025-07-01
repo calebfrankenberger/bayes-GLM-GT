@@ -45,7 +45,7 @@ settings <- list(
   known_acc  = FALSE,
   se_0       = 0.9,
   sp_0       = 0.9,
-  nsim       = 500,
+  nsim       = 3,
   post_git   = 6000,
   burn       = 1000,
   alpha      = 0.05,
@@ -76,10 +76,15 @@ test_data <- lapply(1:settings$nsim, function(i) {
 ##########################
 ##  RUNNING SIMULATION  ##
 ##########################
-res <- run_replicates(test_data, settings)
+res <- run_replicates(test_data, settings, keep_raw=TRUE)
 summary <- summarize_results(res, settings) 
-print_results(summary, settings, digits=2)
-print_settings(settings)
 
+print_results(summary, settings, digits=2)
+#print_settings(settings)
+
+plot_trace(res, settings, replicate=2, parameter=1, type="se")
+plot_post_hist(res, settings, replicate=2, parameter=1, type="se")
+
+#save_results(summary, settings)
 
 ## END OF FILE ##
