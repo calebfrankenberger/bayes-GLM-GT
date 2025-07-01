@@ -21,9 +21,9 @@ library(groupTesting)
 library(parallel)
 
 source("Bayes_Sampler.R")
+source("Estimator.R")
 source("MH_WLS.R")
 source("Results.R")
-source("Simulator.R")
 
 
 ###############
