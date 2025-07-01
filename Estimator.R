@@ -1,27 +1,9 @@
 ################################
-# Simulator.R                  #
+# Estimator.R                  #
 # Author: Caleb Frankenberger  #
 ################################
 
 library(parallel)
-
-#########################
-## SIMULATE DATA       ##
-#########################
-simulate_data <- function(X, settings) {
-  p.t <- settings$g(X %*% settings$beta_true)
-  sim_out <- hier.gt.simulation(
-    N       = nrow(X),
-    p       = p.t,
-    S       = length(settings$psz),
-    psz     = settings$psz,
-    Se      = settings$se_t,
-    Sp      = settings$sp_t,
-    assayID = settings$assay_id
-  )
-  
-  list(X = X, Z = sim_out$gtData, tsts = sim_out$testsExp)
-}
 
 
 #########################

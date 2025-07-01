@@ -5,14 +5,10 @@
 
 
 #TODO LIST:
-# Se0 and Sp0 separately
-# Script for individual run (with debugging)
-# Traceplot + Histogram capability - plot convergence
 # rbeta in Fortran (test in R first)
 # Test SeSp starting values + beta starting values
 # (0.99, 0.95, 0.75, 0.50, 0.25)
 # 5 beta values as well (0 as one)
-# ESE for SeSp
 # Any number of assays (L is the notation they used in the paper)
 # As much of the sampler in Fortran as we can feasibly do
 
@@ -69,7 +65,19 @@ test_data <- lapply(1:settings$nsim, function(i) {
               "M1" = cbind(1, x1),
               "M2" = cbind(1, x1, x2),
               "M3" = cbind(1, x1, x1^2))
-  simulate_data(X, settings)
+  
+  p.t <- settings$g(X %*% settings$beta_true)
+  sim_out <- hier.gt.simulation(
+    N       = nrow(X),
+    p       = p.t,
+    S       = length(settings$psz),
+    psz     = settings$psz,
+    Se      = settings$se_t,
+    Sp      = settings$sp_t,
+    assayID = settings$assay_id
+  )
+  
+  list(X = X, Z = sim_out$gtData, tsts = sim_out$testsExp)
 })
 
 
