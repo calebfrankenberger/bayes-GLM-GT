@@ -1,0 +1,15 @@
+*.dll
+*.dll.a
+*.mod
+*.def
+*.exe
+
+build/
+modules/
+dll/
+
+.Rhistory
+.RData
+.Rproj.user/
+.DS_Store
+*.zip
