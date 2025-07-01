@@ -32,38 +32,44 @@ bayes_sampler <- function(beta_init, Z, X, N, S, g, a, R, post_git, known_acc, s
   Zrow <- nrow(Z)
   Zcol <- ncol(Z)
   
+  Ztil_out <- integer(Zrow * Zcol)
+  se_out   <- integer(2L * num_assays)
+  sp_out   <- integer(2L * num_assays)
+  
+  
   accept <- rep(-9, post_git)
   beta_sv <- matrix(-9, post_git, length(beta_init))
   
   if (!known_acc) {
     se_sv <- matrix(NA, post_git, num_assays)
     sp_sv <- matrix(NA, post_git, num_assays)
+    se <- rep(settings$se_0, length.out = num_assays)
+    sp <- rep(settings$sp_0, length.out = num_assays)
   }
+  
+  U_all <- matrix(runif(N * post_git), nrow = N, ncol = post_git)
+  assay_map <- match(assay_vec, unique_assays)
+  se_sp <- matrix(NA_real_, nrow = length(assay_vec), ncol = 2)
   
   # Begin Gibbs sampling:
   for (s in 1:post_git) {
     pvec <- g(drop(X %*% beta_init))
-    U <- runif(N)
-    
-    se_out   <- integer(2L * num_assays)
-    sp_out   <- integer(2L * num_assays)
-    Ztil_out <- integer(Zrow * Zcol)
-    
     res <- .C("sample",
-              as.double(pvec),
-              Ytmat = as.integer(Ytmat),
-              as.integer(Z),
-              as.integer(N),
-              as.double(se_sp),
-              as.integer(Ycol),
-              as.integer(Zrow),
-              as.integer(Zcol),
-              as.double(U), 
-              Ztil        = as.integer(Ztil_out),
-              as.integer(assay_vec),
-              as.integer(num_assays),
-              se_counts   = as.integer(se_out),
-              sp_counts   = as.integer(sp_out)
+              p            = as.double(pvec),
+              Ytmat        = as.integer(Ytmat),
+              Z_mat        = as.integer(Z),
+              N            = as.integer(N),
+              Ycols        = as.integer(Ycol),
+              Zrows        = as.integer(Zrow),
+              Zcols        = as.integer(Zcol),
+              U            = as.double(U_all[, s]),
+              Ztil         = as.integer(Ztil_out),
+              assay_vec    = as.integer(assay_vec),
+              L            = as.integer(num_assays),
+              se_in        = as.double(se),
+              sp_in        = as.double(sp),
+              se_counts    = as.integer(se_out),
+              sp_counts    = as.integer(sp_out)
     )
     Ytmat     <- matrix(res$Ytmat, N, Ycol)
     Ztil      <- matrix(res$Ztil, Zrow, Zcol)
@@ -92,11 +98,8 @@ bayes_sampler <- function(beta_init, Z, X, N, S, g, a, R, post_git, known_acc, s
       
       se_sv[s, ] <- se 
       sp_sv[s, ] <- sp
-      
-      se_sp <- cbind(
-        se[match(assay_vec, unique_assays)],
-        sp[match(assay_vec, unique_assays)]
-      )
+      se_sp[, 1] <- se[assay_map]
+      se_sp[, 2] <- sp[assay_map]
     }
     
     

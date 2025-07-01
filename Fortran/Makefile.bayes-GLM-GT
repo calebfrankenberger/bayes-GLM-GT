@@ -25,7 +25,7 @@ PRJ_CFLAGS=
 
 PRJ_LFLAGS=-mrtd -static
 
-FFLAGS=$(SPECIALFLAGS) $(OPTFLAGS) $(IDIR) $(PRJ_FFLAGS) -JC:/Users/caleb/Desktop/Research/Fortran/modules 
+FFLAGS=$(SPECIALFLAGS) $(OPTFLAGS) $(IDIR) $(PRJ_FFLAGS) -JC:/Users/caleb/Desktop/Research/bayes-GLM-GT/Fortran/modules 
 
 CFLAGS=$(SPECIALFLAGS) $(OPTFLAGS) $(IDIR) $(PRJ_CFLAGS)
 

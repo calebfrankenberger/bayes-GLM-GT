@@ -3,24 +3,29 @@
 ! Author: Caleb Frankenberger
 !-----------------------------------------------------------------------
 
-subroutine sample(p, Yt_mat, Z_mat, N, SeSp, Ycols, Zrows, Zcols, U, Ztil, assay_vec, L, se_counts, sp_counts) 
+subroutine sample(p, Yt_mat, Z_mat, N, Ycols, Zrows, Zcols, U, Ztil, assay_vec, L, se_in, sp_in, se_counts, &
+    sp_counts)
     implicit none
     
-    !-- Arguments --!
-    integer, intent(in) :: assay_vec(Zrows) ! Assay assignment for each pool
-    integer, intent(in) :: L                ! Number of unique assays
-    integer, intent(out) :: se_counts(2, L) ! [TP, FN] counts per assay
-    integer, intent(out) :: sp_counts(2, L) ! [TN, FP] counts per assay
-    integer, intent(in) :: N        ! Number of individuals
-    integer, intent(in) :: Ycols    ! Number of columns in Yt_mat
-    integer, intent(in) :: Zrows    ! Number of rows in Z_mat (number of pools)
-    integer, intent(in) :: Zcols    ! Number of columns in Z_mat
-    integer, intent(out) :: Ztil(Zrows, Zcols) ! Holds the true pool status
-    real*8, intent(in) :: p(N)                 ! Prior probability of disease for each individual
-    integer, intent(inout) :: Yt_mat(N, Ycols) ! Individual status and pool membership
-    integer, intent(inout) :: Z_mat(Zrows, Zcols) ! Pool test results and composition
-    real*8, intent(in) :: SeSp(Zrows, 2)       ! Sensitivity and Specificity for each pool [Se, Sp]
-    real*8, intent(in) :: U(N)                 ! Vector of uniform random numbers for sampling
+  !-- Arguments --!
+    integer, intent(in)    :: assay_vec(Zrows)         ! Assay assignment for each pool
+    integer, intent(in)    :: L                        ! Number of unique assays
+    integer, intent(out)   :: se_counts(2, L)          ! [TP, FN] counts per assay
+    integer, intent(out)   :: sp_counts(2, L)          ! [TN, FP] counts per assay
+
+    integer, intent(in)    :: N                        ! Number of individuals
+    integer, intent(in)    :: Ycols                    ! Number of columns in Yt_mat
+    integer, intent(in)    :: Zrows                    ! Number of rows in Z_mat (number of pools)
+    integer, intent(in)    :: Zcols                    ! Number of columns in Z_mat
+
+    integer, intent(out)   :: Ztil(Zrows, Zcols)       ! Holds the true pool status
+    integer, intent(inout) :: Yt_mat(N, Ycols)         ! Individual status and pool membership
+    integer, intent(inout) :: Z_mat(Zrows, Zcols)      ! Pool test results and composition
+
+    real*8, intent(in)     :: p(N)                     ! Prior probability of disease for each individual
+    real*8, intent(in)     :: se_in(L)                 ! Sensitivity for each assay
+    real*8, intent(in)     :: sp_in(L)                 ! Specificity for each assay
+    real*8, intent(in)     :: U(N)                     ! Vector of uniform random numbers for sampling
 
     !-- Local Vars --!
     integer :: i, j, k, s        ! Counters and indices
@@ -58,8 +63,9 @@ subroutine sample(p, Yt_mat, Z_mat, N, SeSp, Ycols, Zrows, Zcols, U, Ztil, assay
             p_id  = Yt_mat(i, 2 + j)
             p_res = Z_mat(p_id, 1)
             p_sz  = Z_mat(p_id, 2)
-            Se    = SeSp(p_id, 1)
-            Sp    = SeSp(p_id, 2)
+            a_id  = assay_vec(p_id)
+            Se = se_in(a_id)
+            Sp = sp_in(a_id)
             
             ! Determine effective RSe and RSp based on observed result of current pool
             ! - If the pool tested positive:
@@ -93,16 +99,17 @@ subroutine sample(p, Yt_mat, Z_mat, N, SeSp, Ycols, Zrows, Zcols, U, Ztil, assay
         end do
         
         ! Multiply by prior probs
-        prob0 = (1.0 - p(i)) * prob0
+        prob0 = (1.0D0 - p(i)) * prob0
         prob1 = p(i) * prob1
-        
+
         ! Normalize
         den = prob0 + prob1
-        if(den == 0.0D0) then
+        if (den == 0.0D0) then
             prob0 = 1.0D0 - p(i)
         else
-            prob0 = prob0/den
+            prob0 = prob0 / den
         end if
+
         
         ! Sample new status for current individual
         if(U(i) > prob0) then

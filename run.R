@@ -16,7 +16,6 @@ rm(list=ls())
 setwd("C:/Users/caleb/Desktop/Research/bayes-GLM-GT")
 
 library(mnormt)
-library(matrixcalc)
 library(groupTesting)
 library(parallel)
 

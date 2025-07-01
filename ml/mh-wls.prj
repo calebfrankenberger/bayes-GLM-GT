@@ -1,0 +1,70 @@
+{
+  "Root":{
+    "Folders":[],
+    "Name":"+mh-wls (mhwls.f90.dll)",
+    "Files":[{
+        "filename":".\\mhwls.f90",
+        "enabled":"1"
+      }]
+  },
+  "Name":"mh-wls (mhwls.f90.dll)",
+  "Options":{
+    "Compiler Options":{
+      "Fortran Flags":"-fno-underscoring",
+      "Resource Flags":"",
+      "Link Flags":"-mrtd -static",
+      "C Flags":""
+    },
+    "Architecture":1,
+    "Type":1,
+    "Revision":2,
+    "Windows GUI":0,
+    "File Options":{
+      "Library Directories":["Default Add-On Directory"],
+      "Build Directory":"build",
+      "Module Directory":"modules",
+      "Include Directories":["Default Add-On Include Directory"]
+    },
+    "Target":"mhwls.f90.dll",
+    "Fortran Options":{
+      "Floating Point Exception Trap":0,
+      "Initialize Variables to Zero":"false",
+      "Use C Preprocessor":"false",
+      "Runtime Diagnostics":"false",
+      "Cray Pointers":"false",
+      "Disable Floating Point Exception Warnings":0,
+      "Enable OpenMP":"false",
+      "Enable Coarrays":"false",
+      "Default Double for Real":"false"
+    },
+    "Code Generation Options":{
+      "CPU Specific":"false",
+      "Processor":"generic",
+      "Aggressive Loops":"false",
+      "Debugging":"true",
+      "Optimization Mode":0,
+      "Profiling":"false",
+      "Link Time Optimization":"false"
+    },
+    "Build Dependencies":1,
+    "Launch Options":{
+      "Working Directory":"",
+      "Launch Using MPI":"false",
+      "Keep Console":"true",
+      "External Console":"false",
+      "Command Line Arguments":"",
+      "Build Before Launch":"true"
+    },
+    "Build Options":{
+      "Auto Management":"true",
+      "Makefile":"Makefile.mh-wls",
+      "Auto Makefile":"true"
+    },
+    "Linker Options":{
+      "Static Linking Mode":7,
+      "Link MPI Library":"false",
+      "Build Import Library":"true",
+      "Link LAPACK":1
+    }
+  }
+}

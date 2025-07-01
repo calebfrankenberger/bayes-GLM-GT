@@ -17,7 +17,6 @@
 #
 wls.mh.alg <- function(b0,X,y,a,R){
   library(mnormt)
-  library(matrixcalc)
   
   res <- mt.ct(b=b0,y=y,X=X,sig=0,a=a,R=R)
   Mb0 <- res$M
@@ -72,20 +71,20 @@ mt.ct <- function(b,y,X,sig,a,R){
   W <- p*(1-p)
   Yb <- xb*(p*(1-p))+(y-p)
   XWX <- t(X*matrix(W,ncol=P,nrow=length(W),byrow=FALSE))%*%X
-  XWX <- XWX + 1e-6 * diag(ncol(X))
+  diag(XWX) <- diag(XWX) + 1e-6
+  
+  log_den <- log1p(exp(-abs(xb))) + pmax(xb, 0)
   
   if(is.null(R)){
     C <- solve(XWX)
     C <- (C+t(C))/2
     M <- C%*%(t(X)%*%(Yb))
-    log_den <- log1p(exp(-abs(xb))) + pmax(xb, 0)
     L <- sum(y * xb - log_den)
   }else{
     R.inv <- solve(R)
     C <- solve(R.inv+XWX)
     C <- (C+t(C))/2
     M <- C%*%(R.inv%*%a+t(X)%*%(Yb))
-    log_den <- log1p(exp(-abs(xb))) + pmax(xb, 0)
     L <- (-1/2)*((b-a)%*%R.inv%*%(b-a))+sum(y*(xb)-log_den)
   }
   return(list("M"=M, "C"=C, "L"=L, "s"=sig))
