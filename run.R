@@ -1,5 +1,5 @@
 ################################
-# Run_Sim.R                    #
+# run.R                        #
 # Author: Caleb Frankenberger  #
 ################################
 
@@ -20,10 +20,10 @@ library(matrixcalc)
 library(groupTesting)
 library(parallel)
 
-source("Bayes_Sampler.R")
-source("Estimator.R")
-source("MH_WLS.R")
-source("Results.R")
+source("R/bayes_sampler.R")
+source("R/estimator.R")
+source("R/mh_wls.R")
+source("R/results.R")
 
 
 ###############
@@ -41,11 +41,12 @@ settings <- list(
   known_acc  = FALSE,
   se_0       = 0.9,
   sp_0       = 0.9,
-  nsim       = 3,
+  nsim       = 500,
   post_git   = 6000,
   burn       = 1000,
   alpha      = 0.05,
-  g          = function(t) exp(t) / (1 + exp(t))
+  g          = stats::plogis,
+  keep_raw   = TRUE
 )
 settings$beta_true <- switch(settings$model,
                     "M1" = c(-3, 2),
@@ -84,15 +85,14 @@ test_data <- lapply(1:settings$nsim, function(i) {
 ##########################
 ##  RUNNING SIMULATION  ##
 ##########################
-res <- run_replicates(test_data, settings, keep_raw=TRUE)
-summary <- summarize_results(res, settings) 
+res <- run_replicates(test_data, settings)
 
-print_results(summary, settings, digits=2)
+print_results(res, settings, digits=2)
 #print_settings(settings)
 
 plot_trace(res, settings, replicate=2, parameter=1, type="se")
 plot_post_hist(res, settings, replicate=2, parameter=1, type="se")
 
-#save_results(summary, settings)
+#save_results(res, settings)
 
 ## END OF FILE ##

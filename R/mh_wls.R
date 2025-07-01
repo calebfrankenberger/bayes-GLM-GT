@@ -34,9 +34,26 @@ wls.mh.alg <- function(b0,X,y,a,R){
   Lb.star <- res2$L
   
   qb0 <- dmnorm(b0,as.vector(Mb.star),Cb.star)
-  ratio.pi <- exp(Lb.star-Lb0)
-  alpha <- min(1,max(0,((ratio.pi*qb0)/(qb.star))))
-  accept <- rbinom(1,1,alpha)
+ 
+  ## THIS SECTION HAS BEEN CHANGED TO 
+  ## FIX CRASHING CAUSED BY RBINOM FAILING
+  ratio.pi <- exp(Lb.star - Lb0)
+  raw_alpha <- (ratio.pi * qb0) / qb.star
+  
+  if (!is.finite(raw_alpha)) {
+    alpha <- 0
+  } else {
+    alpha <- min(1, max(0, raw_alpha))
+  }
+  
+  accept <- rbinom(1, 1, alpha)
+  #########################################
+  
+  ##ORIGINAL:
+  # ratio.pi <- exp(Lb.star - Lb0)
+  # alpha <- min(1, max(0, ((ratio.pi * qb0) / (qb.star))))
+  # accept <- rbinom(1, 1, alpha)
+  
   if(accept==1){b1 <- b.star}
   if(accept==0){b1 <- b0}
   return(list("param"=b1,"accept"=accept))
@@ -51,26 +68,25 @@ mt.ct <- function(b,y,X,sig,a,R){
   P <- length(b)
   xb <- X%*%b
   
-  p <- exp(xb)/(1+exp(xb))
+  p <- plogis(xb)
   W <- p*(1-p)
   Yb <- xb*(p*(1-p))+(y-p)
   XWX <- t(X*matrix(W,ncol=P,nrow=length(W),byrow=FALSE))%*%X
-  if(is.non.singular.matrix(XWX)==FALSE || sig==1){
-    XWX <- XWX+0.1*diag(rep(1,P))
-    sig <- 1
-  }
+  XWX <- XWX + 1e-6 * diag(ncol(X))
   
   if(is.null(R)){
     C <- solve(XWX)
     C <- (C+t(C))/2
     M <- C%*%(t(X)%*%(Yb))
-    L <- sum(y*(xb)-log(1+exp(xb)))
+    log_den <- log1p(exp(-abs(xb))) + pmax(xb, 0)
+    L <- sum(y * xb - log_den)
   }else{
     R.inv <- solve(R)
     C <- solve(R.inv+XWX)
     C <- (C+t(C))/2
     M <- C%*%(R.inv%*%a+t(X)%*%(Yb))
-    L <- (-1/2)*((b-a)%*%R.inv%*%(b-a))+sum(y*(xb)-log(1+exp(xb)))
+    log_den <- log1p(exp(-abs(xb))) + pmax(xb, 0)
+    L <- (-1/2)*((b-a)%*%R.inv%*%(b-a))+sum(y*(xb)-log_den)
   }
   return(list("M"=M, "C"=C, "L"=L, "s"=sig))
 }

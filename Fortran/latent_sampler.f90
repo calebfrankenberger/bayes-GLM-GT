@@ -25,6 +25,7 @@ subroutine sample_latent_statuses(p, Yt_mat, Z_mat, N, SeSp, Ycols, Zrows, Zcols
     integer :: p_res                ! Current pool's observed test result
     integer :: num_pos              ! Number of other positive individuals in the current pool
     integer :: n_pools              ! Number of pools the current individual 'i' belongs to
+    real*8 :: den                   ! Denominator used in calculating prob0
     real*8 :: prob0                 ! Conditional probability the individual is negative
     real*8 :: prob1                 ! Unnormalized conditional probability the individual is positive
     real*8 :: Se, Sp                ! Sensitivity and Specificity for the current pool
@@ -32,6 +33,7 @@ subroutine sample_latent_statuses(p, Yt_mat, Z_mat, N, SeSp, Ycols, Zrows, Zcols
     
     ! Loop each individual to sample their latent status
     do i=1, N
+    
         ! Exclude the current individual
         Yt_mat(i, 1) = 0
         
@@ -86,7 +88,12 @@ subroutine sample_latent_statuses(p, Yt_mat, Z_mat, N, SeSp, Ycols, Zrows, Zcols
         prob1 = p(i) * prob1
         
         ! Normalize
-        prob0 = prob0/(prob0 + prob1)
+        den = prob0 + prob1
+        if(den == 0.0D0) then
+            prob0 = 1.0D0 - p(i)
+        else
+            prob0 = prob0/den
+        end if
         
         ! Sample new status for current individual
         if(U(i) > prob0) then

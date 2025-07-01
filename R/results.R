@@ -1,117 +1,7 @@
 ################################
-# Results.R                    #
+# results.R                    #
 # Author: Caleb Frankenberger  #
 ################################
-
-
-#######################
-## SUMMARIZE RESULTS ##
-#######################
-# Eventually this should output all the RAW summary data
-summarize_results <- function(results, settings) {
-  beta_means <- results$beta_means
-  beta_sds   <- results$beta_sds
-  tests      <- results$tests
-  cred_ints  <- results$cred_ints
-  runtime    <- results$runtime
-  beta_true  <- settings$beta_true
-  se_t       <- settings$se_t
-  sp_t       <- settings$sp_t
-  alpha      <- settings$alpha
-  
-  beta_est <- colMeans(beta_means)
-  bias     <- beta_est - beta_true
-  ssd      <- apply(beta_means, 2, sd)
-  ese      <- colMeans(beta_sds)
-  avg_tests <- mean(tests)
-  
-  P <- length(beta_true)
-  nsim <- nrow(beta_means)
-  cp <- numeric(P)
-  for (j in 1:P) {
-    indicators <- numeric(nsim)
-    for (i in 1:nsim) {
-      ci_j <- cred_ints[[i]][[j]]
-      if (is.numeric(ci_j) && length(ci_j) == 2 && all(!is.na(ci_j))) {
-        indicators[i] <- beta_true[j] >= ci_j[1] && beta_true[j] <= ci_j[2]
-      } else {
-        indicators[i] <- NA
-      }
-    }
-    cp[j] <- mean(indicators, na.rm = TRUE)
-  }
-  
-  df_par <- data.frame(
-    Parameter   = paste0("beta", seq_along(beta_true) - 1),
-    TrueValue   = beta_true,
-    EstMean     = beta_est,
-    Bias        = bias,
-    CP          = cp,
-    SSD         = ssd,
-    ESE         = ese,
-    stringsAsFactors = FALSE
-  )
-  
-  output <- list(
-    param_summary = df_par,
-    avg_tests     = avg_tests,
-    runtime       = runtime
-  )
-  
-  if (!is.null(results$se_samps) && !is.null(results$sp_samps)) {
-    se_means <- do.call(rbind, lapply(results$se_samps, colMeans))
-    sp_means <- do.call(rbind, lapply(results$sp_samps, colMeans))
-    se_sds   <- do.call(rbind, lapply(results$se_samps, function(m) apply(m, 2, sd)))
-    sp_sds   <- do.call(rbind, lapply(results$sp_samps, function(m) apply(m, 2, sd)))
-    
-    se_post_mean <- colMeans(se_means)
-    sp_post_mean <- colMeans(sp_means)
-    se_ese       <- colMeans(se_sds)
-    sp_ese       <- colMeans(sp_sds)
-    
-    lb <- alpha / 2
-    ub <- 1 - lb
-    se_cp <- sp_cp <- numeric(ncol(se_means))
-    
-    for (j in seq_len(ncol(se_means))) {
-      se_cis <- t(sapply(results$se_samps, function(m) quantile(m[, j], c(lb, ub))))
-      sp_cis <- t(sapply(results$sp_samps, function(m) quantile(m[, j], c(lb, ub))))
-      se_cp[j] <- mean(se_t[j] >= se_cis[, 1] & se_t[j] <= se_cis[, 2])
-      sp_cp[j] <- mean(sp_t[j] >= sp_cis[, 1] & sp_t[j] <= sp_cis[, 2])
-    }
-    
-    assay_labels <- colnames(results$se_samps[[1]])
-    assay_ids <- as.integer(gsub("Se_a", "", assay_labels))
-    
-    matched_se_t <- se_t[match(assay_ids, unique(settings$assay_id))]
-    matched_sp_t <- sp_t[match(assay_ids, unique(settings$assay_id))]
-    
-    se_bias <- se_post_mean - matched_se_t
-    sp_bias <- sp_post_mean - matched_sp_t
-    
-    acc_summary <- data.frame(
-      Assay    = assay_ids,
-      True_Se  = matched_se_t,
-      Est_Se   = se_post_mean,
-      Bias_Se  = se_bias,
-      CP_Se    = se_cp,
-      SSD_Se   = apply(se_means, 2, sd),
-      ESE_Se   = se_ese,
-      True_Sp  = matched_sp_t,
-      Est_Sp   = sp_post_mean,
-      Bias_Sp  = sp_bias,
-      CP_Sp    = sp_cp,
-      SSD_Sp   = apply(sp_means, 2, sd),
-      ESE_Sp   = sp_ese
-    )
-    
-    output$Se_summary  <- se_post_mean
-    output$Sp_summary  <- sp_post_mean
-    output$acc_summary <- acc_summary
-  }
-  
-  return(output)
-}
 
 
 #######################
@@ -309,7 +199,7 @@ save_results <- function(summary, settings, filename = NULL) {
   write.table('', file = out_file, append = TRUE,
               col.names = FALSE, row.names = FALSE, quote = FALSE)
   
-  header_line <- paste(names(combined), collapse = ',')
+  header_line <- paste0(names(combined), collapse = ',')
   write(header_line, file = out_file, append = TRUE)
   write.table(combined,
               file = out_file,
@@ -325,6 +215,10 @@ save_results <- function(summary, settings, filename = NULL) {
 ##  DIAGNOSTIC PLOTS  ##
 ########################
 plot_trace <- function(results, settings, replicate = 1, parameter = 1, type = c("beta","se","sp")) {
+  if (!settings$keep_raw) {
+    stop("Trace and posterior plots require settings$keep_raw = TRUE.")
+  }
+  
   type <- match.arg(type)
   raw  <- switch(type,
                  beta = results$beta_raw,
@@ -352,6 +246,10 @@ plot_trace <- function(results, settings, replicate = 1, parameter = 1, type = c
 }
 
 plot_post_hist <- function(results, settings, replicate = 1, parameter = 1, type = c("beta","se","sp"), breaks = 30) {
+  if (!settings$keep_raw) {
+    stop("Trace and posterior plots require settings$keep_raw = TRUE.")
+  }
+  
   type <- match.arg(type)
   raw  <- switch(type,
                  beta = results$beta_raw,

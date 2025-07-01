@@ -1,0 +1,70 @@
+{
+  "Root":{
+    "Folders":[],
+    "Name":"+bayes-GLM-GT (latent_sampler.dll)",
+    "Files":[{
+        "filename":".\\latent_sampler.f90",
+        "enabled":"1"
+      }]
+  },
+  "Name":"bayes-GLM-GT (latent_sampler.dll)",
+  "Options":{
+    "Compiler Options":{
+      "Fortran Flags":"-fno-underscoring -fopenmp",
+      "Resource Flags":"",
+      "Link Flags":"-mrtd -static -fopenmp",
+      "C Flags":""
+    },
+    "Architecture":1,
+    "Type":1,
+    "Revision":2,
+    "Windows GUI":0,
+    "File Options":{
+      "Library Directories":["Default Add-On Directory"],
+      "Build Directory":"build",
+      "Module Directory":"modules",
+      "Include Directories":["Default Add-On Include Directory"]
+    },
+    "Target":"latent_sampler.dll",
+    "Fortran Options":{
+      "Floating Point Exception Trap":0,
+      "Initialize Variables to Zero":"false",
+      "Use C Preprocessor":"false",
+      "Runtime Diagnostics":"false",
+      "Cray Pointers":"false",
+      "Disable Floating Point Exception Warnings":0,
+      "Enable OpenMP":"false",
+      "Enable Coarrays":"false",
+      "Default Double for Real":"false"
+    },
+    "Code Generation Options":{
+      "CPU Specific":"false",
+      "Processor":"generic",
+      "Aggressive Loops":"false",
+      "Debugging":"true",
+      "Optimization Mode":0,
+      "Profiling":"false",
+      "Link Time Optimization":"false"
+    },
+    "Build Dependencies":1,
+    "Launch Options":{
+      "Working Directory":"",
+      "Launch Using MPI":"false",
+      "Keep Console":"true",
+      "External Console":"false",
+      "Command Line Arguments":"",
+      "Build Before Launch":"true"
+    },
+    "Build Options":{
+      "Auto Management":"true",
+      "Makefile":"Makefile.bayes-GLM-GT",
+      "Auto Makefile":"true"
+    },
+    "Linker Options":{
+      "Static Linking Mode":7,
+      "Link MPI Library":"false",
+      "Build Import Library":"true",
+      "Link LAPACK":0
+    }
+  }
+}

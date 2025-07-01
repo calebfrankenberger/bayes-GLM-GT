@@ -1,5 +1,5 @@
 #########################################
-# Bayes_Sampler.R                       #
+# bayes_sampler.R                       #
 # Author:  Caleb Frankenberger          #
 # Purpose: Runs Bayesian Gibbs sampler  #
 #########################################
